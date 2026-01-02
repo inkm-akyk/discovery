@@ -146,6 +146,7 @@ def send_slack_notification(all_discoveries):
         # 各記事
         for i, item in enumerate(items, 1):
             title_ja = item.get('title_ja', item.get('title', ''))
+            title_en = item.get('title', '')
             url = item.get('url', '')
             score = item.get('score', 0)
             comments = item.get('comments', 0)
@@ -159,11 +160,14 @@ def send_slack_notification(all_discoveries):
 
             meta_str = " | ".join(meta) if meta else ""
 
+            # タイトル表示（日本語訳 + 英語原文）
+            title_display = f"*{title_ja}*\n_{title_en}_"
+
             blocks.append({
                 "type": "section",
                 "text": {
                     "type": "mrkdwn",
-                    "text": f"{i}. *{title_ja}*\n{meta_str}\n<{url}|記事を見る>"
+                    "text": f"{i}. {title_display}\n{meta_str}\n<{url}|記事を見る>"
                 }
             })
 
@@ -204,17 +208,17 @@ try:
         all_discoveries['Hacker News'] = hn_articles
 
     # 2. r/BuyItForLife
-    bifl_posts = fetch_reddit_rss('BuyItForLife', limit=3)
+    bifl_posts = fetch_reddit_rss('BuyItForLife', limit=5)
     if bifl_posts:
         all_discoveries['r/BuyItForLife'] = bifl_posts
 
     # 3. r/malefashionadvice
-    mfa_posts = fetch_reddit_rss('malefashionadvice', limit=3)
+    mfa_posts = fetch_reddit_rss('malefashionadvice', limit=5)
     if mfa_posts:
         all_discoveries['r/malefashionadvice'] = mfa_posts
 
     # 4. r/LocalLLaMA
-    llama_posts = fetch_reddit_rss('LocalLLaMA', limit=3)
+    llama_posts = fetch_reddit_rss('LocalLLaMA', limit=5)
     if llama_posts:
         all_discoveries['r/LocalLLaMA'] = llama_posts
 
