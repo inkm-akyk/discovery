@@ -8,20 +8,22 @@ on:
 jobs:
   discover:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-      
+
       - name: Install dependencies
         run: |
-          pip install requests beautifulsoup4
-      
+          pip install -r requirements.txt
+
       - name: Run discovery script
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           python scripts/discover.py
