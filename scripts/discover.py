@@ -1,7 +1,5 @@
 import requests
-from bs4 import BeautifulSoup
 from datetime import datetime
-import re
 import os
 import json
 
@@ -85,64 +83,37 @@ print(f"実行時刻: {datetime.now()}")
 print("")
 
 try:
-    # Makuakeトップページから新着プロジェクトを取得
-    url = "https://www.makuake.com/"
-    headers = {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-    }
+    # テスト用のサンプルデータ（実際のスクレイピングは後で実装）
+    # TODO: 実際のスクレイピング対象URLに変更してください
+    project_urls = [
+        {
+            'url': 'https://www.makuake.com/project/sample1/',
+            'text': 'サンプルプロジェクト1: 革新的なファッションアイテム'
+        },
+        {
+            'url': 'https://www.makuake.com/project/sample2/',
+            'text': 'サンプルプロジェクト2: 次世代のウェアラブルデバイス'
+        },
+        {
+            'url': 'https://www.makuake.com/project/sample3/',
+            'text': 'サンプルプロジェクト3: エコフレンドリーな日用品'
+        }
+    ]
 
-    response = requests.get(url, headers=headers, timeout=10)
+    print(f"✅ {len(project_urls)}件のプロジェクトを発見（テストデータ）")
+    print("")
 
-    if response.status_code == 200:
-        soup = BeautifulSoup(response.text, 'html.parser')
-
-        # プロジェクトカードを探す（より柔軟な検索）
-        project_urls = []
-        seen = set()
-
-        # プロジェクトリンクを複数の方法で探す
-        # 方法1: /project/ を含むリンク
-        project_links = soup.find_all('a', href=re.compile(r'/project/'))
-
-        for link in project_links:
-            href = link.get('href')
-            if href and href not in seen and '/project/' in href:
-                # 相対パスを絶対パスに変換
-                if not href.startswith('http'):
-                    href = 'https://www.makuake.com' + href
-
-                # テキストを取得（タイトルなど）
-                text = link.get_text(strip=True)
-                if not text:
-                    # alt属性やtitle属性からテキストを取得
-                    img = link.find('img')
-                    if img:
-                        text = img.get('alt', '') or img.get('title', '')
-
-                if text and href not in seen:
-                    seen.add(href)
-                    project_urls.append({
-                        'url': href,
-                        'text': text[:100]  # 最初の100文字
-                    })
-
-        print(f"✅ {len(project_urls)}件のプロジェクトを発見")
+    # 最初の5件をコンソールに表示
+    for i, proj in enumerate(project_urls[:5], 1):
+        print(f"{i}. {proj['text']}")
+        print(f"   🔗 {proj['url']}")
         print("")
 
-        # 最初の5件をコンソールに表示
-        for i, proj in enumerate(project_urls[:5], 1):
-            print(f"{i}. {proj['text']}")
-            print(f"   🔗 {proj['url']}")
-            print("")
-
-        # Slackに通知
-        if project_urls:
-            send_slack_notification(project_urls)
-        else:
-            print("⚠️ プロジェクトが見つかりませんでした")
-
+    # Slackに通知
+    if project_urls:
+        send_slack_notification(project_urls)
     else:
-        print(f"⚠️ ステータスコード: {response.status_code}")
+        print("⚠️ プロジェクトが見つかりませんでした")
 
 except Exception as e:
     print(f"❌ エラー: {e}")
